@@ -1,3 +1,6 @@
+using NHibernate;
+using WebApplication1.Code.DataAccess;
+
 [assembly: WebActivator.PreApplicationStartMethod(typeof(WebApplication1.App_Start.NinjectWebCommon), "Start")]
 [assembly: WebActivator.ApplicationShutdownMethodAttribute(typeof(WebApplication1.App_Start.NinjectWebCommon), "Stop")]
 
@@ -58,6 +61,12 @@ namespace WebApplication1.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
+            kernel.Bind<ISession>().ToMethod(x =>
+            {
+                var session = SessionProvider.Instance.Value.OpenSession();
+                return session;
+            }).InRequestScope(); // This is all of your session management. Really. 
+            // You can now inject "ISession" and get the same one every time, implementing the "session per request pattern".
         }        
     }
 }

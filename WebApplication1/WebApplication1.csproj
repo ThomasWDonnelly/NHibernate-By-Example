@@ -143,6 +143,7 @@
     <Compile Include="App_Start\NinjectWebCommon.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\NinjectDependencyResolver.cs" />
+    <Compile Include="Code\DataAccess\SessionFactory.cs" />
     <Compile Include="Code\Model\CreditCard.cs" />
     <Compile Include="Code\Model\Customer.cs" />
     <Compile Include="Code\Model\Gender.cs" />
