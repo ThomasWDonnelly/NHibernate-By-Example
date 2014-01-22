@@ -16,20 +16,17 @@ namespace WebApplication1.Controllers
 
         public ActionResult Index()
         {
-            // This is how you're actually meant to modify data...
+            // There is a possible gotcha here though. Make sure you remember to commit your transaction...
 
             using (var tx = _session.BeginTransaction())
             {
                 var customer = _session.Get<Customer>(1);
                 customer.Name = "NameGoesHere_" + Guid.NewGuid();
 
-                tx.Commit();
+                //tx.Commit();
             }
 
-            // Notice how that's much less code.
-            // Because we "got" the entity from the session, NHibernates change tracking knows about the
-            // object and is tracking its state.
-            // When the transaction is committed, everything is cleared out and saved down.
+            // Notice how without that commit, your changes aren't saved.
 
             return View();
         }
