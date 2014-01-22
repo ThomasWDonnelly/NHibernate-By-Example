@@ -2,6 +2,7 @@
 using System.Configuration;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
+using FluentNHibernate.Utils;
 using NHibernate;
 
 namespace WebApplication1.Code.DataAccess
@@ -32,6 +33,12 @@ namespace WebApplication1.Code.DataAccess
                 Fluently.Configure()
                     .Database(MsSqlConfiguration.MsSql2008.ConnectionString(cs))
                     .Mappings(m => m.FluentMappings.AddFromAssemblyOf<SessionProvider>())
+                    .ExposeConfiguration(config =>
+                    {
+                        // We're forcefully adding a prefix to each of the class mappings to match our database here
+                        // We can alternatively use Table("name"); in each classmap, or add a table naming convention.
+                        config.ClassMappings.Each(m => m.Table.Name = "tbl_" + m.Table.Name);
+                    })
                     .BuildSessionFactory();
         }
     }
