@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 using NHibernate;
 using WebApplication1.Code.Model;
 
@@ -34,6 +35,19 @@ namespace WebApplication1.Controllers
             // as you'll end up with strange bugs where your entities appear to load, but they haven't.
 
             var customer = _session.Get<Customer>(1);
+
+
+            // Now, not really knowing how to use nhibernate, we want to change some data.
+            customer.Name = customer.Name + "_" + Guid.NewGuid();
+            _session.Save(customer);
+
+            // Awesome! looks like it'll work right?
+            // But guess what, debug through this page load twice - notice how nothing changes?
+            // That's because gotcha! _session.Save() doesn't actually save the data!
+            // Save and SaveOrUpdate associate an item with nhibernates change tracking - they're a statement of intent
+            // They say "I want to save this thing when you flush the session".
+
+            // Guess what we've not done?
 
             return View();
         }
