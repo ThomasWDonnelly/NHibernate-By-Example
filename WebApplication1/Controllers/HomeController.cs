@@ -16,28 +16,20 @@ namespace WebApplication1.Controllers
 
         public ActionResult Index()
         {
-            // So we want to modify some data?
-            // This is how you might think you should do it...
+            // This is how you're actually meant to modify data...
 
-            
-            var customer = _session.Get<Customer>(1);
-            customer.Name = "NameGoesHere_" + Guid.NewGuid();
-            _session.Save(customer);
-            _session.Flush();
+            using (var tx = _session.BeginTransaction())
+            {
+                var customer = _session.Get<Customer>(1);
+                customer.Name = "NameGoesHere_" + Guid.NewGuid();
 
-            // Hey look! That worked.
-            // Except it's not what you're meant to do.
+                tx.Commit();
+            }
 
-            // Flush:
-
-            /* If you happen to be using the ITransaction API, you don't need to worry about this step. 
-             * It will be performed implicitly when the transaction is committed. 
-             * Otherwise you should call ISession.Flush() to ensure that all changes are synchronized with the database.
-             */
-
-            // Flush basically just round-trips to the database, and actually, nhibernate is way smarter than that.
-            // Actually, if you use a transaction, nhibernate better optimises it's round-tripping, and you
-            // should never call flush manually.
+            // Notice how that's much less code.
+            // Because we "got" the entity from the session, NHibernates change tracking knows about the
+            // object and is tracking its state.
+            // When the transaction is committed, everything is cleared out and saved down.
 
             return View();
         }
