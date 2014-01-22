@@ -13,7 +13,12 @@ namespace WebApplication1.Code.DataAccess.FluentMappings
         {
             Id(x => x.Id);
             Map(x => x.Name);
-            Map(x => x.Gender);
+
+            // At this point, our model won't load from the database because we've mapped it as an enum
+            // while it's stored as an integer.
+            // To prevent this nasty bug, we need to map it as it's specific type...
+
+            Map(x => x.Gender).CustomType<Gender>();
         }
     }
 }
