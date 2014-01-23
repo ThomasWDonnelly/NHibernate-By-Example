@@ -5,8 +5,6 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{33462124-BCA7-445F-921D-1A26F84DA34D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1.Test.Unit", "..\WebApplication1\WebApplication1.Test.Unit\WebApplication1.Test.Unit.csproj", "{56B11E9C-4E95-4A55-87B4-1D994253A069}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{57286355-B888-4719-8FCC-2A43AD6A96C5}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -24,10 +22,6 @@ Global
 		{33462124-BCA7-445F-921D-1A26F84DA34D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33462124-BCA7-445F-921D-1A26F84DA34D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33462124-BCA7-445F-921D-1A26F84DA34D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56B11E9C-4E95-4A55-87B4-1D994253A069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56B11E9C-4E95-4A55-87B4-1D994253A069}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56B11E9C-4E95-4A55-87B4-1D994253A069}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56B11E9C-4E95-4A55-87B4-1D994253A069}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
