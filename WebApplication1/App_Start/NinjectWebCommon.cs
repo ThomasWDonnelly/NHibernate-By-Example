@@ -1,3 +1,5 @@
+using System.Data;
+using System.Diagnostics;
 using NHibernate;
 using WebApplication1.Code.DataAccess;
 
@@ -64,9 +66,24 @@ namespace WebApplication1.App_Start
             kernel.Bind<ISession>().ToMethod(x =>
             {
                 var session = SessionProvider.Instance.Value.OpenSession();
+                // We'll now start a transaction when the request begins
+                session.BeginTransaction(IsolationLevel.ReadCommitted);
                 return session;
-            }).InRequestScope(); // This is all of your session management. Really. 
-            // You can now inject "ISession" and get the same one every time, implementing the "session per request pattern".
+            })
+            .InRequestScope()
+            .OnDeactivation(x =>
+            {
+                // Using Ninject, because it's awesome, we can hook on "deactivation.
+                // And we'll close the active transaction on the request end.
+                if (x.Transaction != null && x.Transaction.IsActive)
+                {
+                    x.Transaction.Commit();
+                    x.Transaction.Dispose();
+                }
+
+                Debug.WriteLine("Now we can forget about transactions in our code!");
+            });
+
         }        
     }
 }

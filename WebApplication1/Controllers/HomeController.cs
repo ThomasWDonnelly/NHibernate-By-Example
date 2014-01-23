@@ -16,17 +16,14 @@ namespace WebApplication1.Controllers
 
         public ActionResult Index()
         {
-            // There is a possible gotcha here though. Make sure you remember to commit your transaction...
+            // Truth is, this makes your code really messy, and what you really want is to follow the
+            // session per request pattern - so lets get rid of all this tedious transaction code 
+            // and move it into our framework classes.
 
-            using (var tx = _session.BeginTransaction())
-            {
-                var customer = _session.Get<Customer>(1);
-                customer.Name = "NameGoesHere_" + Guid.NewGuid();
+            var customer = _session.Get<Customer>(1);
+            customer.Name = "NameGoesHere_" + Guid.NewGuid();
 
-                //tx.Commit();
-            }
-
-            // Notice how without that commit, your changes aren't saved.
+            // If we want this to work, we'll have to add a few more things to our container registrations
 
             return View();
         }
