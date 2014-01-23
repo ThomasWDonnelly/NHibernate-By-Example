@@ -8,40 +8,37 @@ namespace WebApplication1.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ISession _session;
-        private readonly DataAccess1 _da1;
-        private readonly DataAccess2 _da2;
-
-        public HomeController(ISession session, DataAccess1 da1, DataAccess2 da2)
+        private readonly CustomerRepository _customerRepo;
+        
+        public HomeController(ISession session, CustomerRepository customerRepo)
         {
-            _session = session;
-            _da1 = da1;
-            _da2 = da2;
+            _customerRepo = customerRepo;
         }
 
         public ActionResult Index()
         {
-            // Now lets talk a little about the nhibernate cache.
-            // Because we're using session per request, the exact same session
-            // gets injected into all your various classes.
+            // At this point it's common for people to implement repositories over NHibernate.
+            // It's not a good idea, but here's an example of the BAD CODE
 
-            // Check this out!
+            var customer = _customerRepo.Get(1);
 
-            // We're going to inject two classes, that both have an issession, and get the same object, renaming in one.
-            // We know we're still in the same transaction boundary, so what do we expect to see?
+            // This is sucky for several reasons.
+            // 1. Useless indirection - You've just implemented the exact same features as were available on ISession
+            // 2. Constructor explosion - All of a sudden, you need a repo per aggregate root, and often inject many of them at once
+            // 3. You start to loose API features by abstracting away from the ORM - you end up implementing "save or update or saveorupdate" logic
+            // 4. You realise that repositories are meant to be transaction boundaries and start implementing Flush()'s
+            // 5. ... at this point, hindering NHibernates ability to do its job well.
+            // 6. You end up writing loads of boilerplate repositories.
+            // 7. You get angry and say NHibernate doesn't perform
+            // 8. Actually it's just poor design.
 
-            var customerThatWasRenamed = _da1.GetAndRename();
-            var customerThatWasJustReturned = _da2.JustGet();
+            // People do this with the belief that "we can just migrate to another ORM trivially".
+            // It's not trivial to migrate ORMS, you're not really protecting yourself, all you're doing
+            // is restricting yourself to the subset of features of the ORM you're using that are common
+            // with a hand rolled DAL.
 
-            if (customerThatWasRenamed.Name == customerThatWasJustReturned.Name)
-            {
-                Debug.WriteLine("This is clearly the same object, because the ISession instance has it's own internal cache");
-            }
+            // The ISession is your repository. Use it as one.
 
-            // You're now starting to see the power of the ISession and Session Per Request
-            // You can cleverly segment your code functionality, while not worrying about various classes
-            // "round tripping" to the database - because NHibernates change tracking is smart enough to make sure
-            // you get the right object inside a transaction boundary.
 
             return View();
         }
@@ -61,35 +58,31 @@ namespace WebApplication1.Controllers
         }
     }
 
-    public class DataAccess1
+    public interface IRepository<T>
+    {
+        T Get(int id);
+        void Save(T obj);
+    }
+
+    public class CustomerRepository : IRepository<Customer>
     {
         private readonly ISession _session;
 
-        public DataAccess1(ISession session)
+        public CustomerRepository(ISession session)
         {
             _session = session;
         }
 
-        public Customer GetAndRename()
+        public Customer Get(int id)
         {
-            var customer = _session.Get<Customer>(1);
-            customer.Name = "NameGoesHere_" + Guid.NewGuid();
-            return customer;
+            return _session.Get<Customer>(id);
+        }
+
+        public void Save(Customer obj)
+        {
+            _session.SaveOrUpdate(obj);
+            _session.Flush();
         }
     }
 
-    public class DataAccess2
-    {
-        private readonly ISession _session;
-
-        public DataAccess2(ISession session)
-        {
-            _session = session;
-        }
-
-        public Customer JustGet()
-        {
-            return _session.Get<Customer>(1);
-        }
-    }
 }
